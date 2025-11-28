@@ -11,9 +11,9 @@ const HAT = "^";
 
 // Hardcoded board
 let board = [
-	[PLAYER, EMPTY, HOLE],
-	[EMPTY, HOLE, EMPTY],
-	[EMPTY, HAT, EMPTY],
+    [PLAYER, EMPTY, HOLE],
+    [EMPTY, HOLE, EMPTY],
+    [EMPTY, HAT, EMPTY],
 ];
 // Game state
 let playerRow = 0;
@@ -56,45 +56,65 @@ function validatedInput(){
 		case "d": col = 1;
 		break;
 	}
-    
+   
+
 	const newRow = playerRow + row;
 	const newCol = playerCol + col;
+	
 	return {newRow , newCol};
 	
 	}
 
 
 
-function gameRules() {
-	const rowLength = currentBoard.length;
-    const colLength = currentBoard[0].length;
+function gameRules(board, newRow, newCol) {
+	const rowLength = board.length;
+    const colLength = board[0].length;
 
-	const currentPosition = currentBoard[r][c]
+	if (newRow < 0 || newRow >= rowLength || newCol < 0 || newCol >= colLength){
+		console.log("GAME OVER! YOU OUT OF BOUNDS");
+		playing = false;
+		return "lose";
+    }
+	
+	const currentPosition = board[newRow][newCol]
 
 	if(currentPosition === HAT){
+		console.log("YOU WIN! CONGRATUTALATIONS!")
 		playing = false;
-		console.log("YOU WIN!")
 		return "win";
+
 	}
 
-	if (newCol > colLength || newRow >rowLength ){
+	
+	if (currentPosition === HOLE){
+		console.log("GAME OVER! YOU FELL INTO A HOLE")
 		playing = false;
-		console.log("GAME OVER! YOU OUT OF BOUNDS")
 		return "lose";
-    } else if (currentPosition === HOLE){
-		console.log("GAME OVER! YOU STUCK IN THE HOLE")
 	}
+
+
+	return "continue";
 }
 
 
 
 
 
-
+while (playing) {
 printBoard(board);
 const userMove = validatedInput(); //validatedInput() ใช้เพื่อส่งค่าที่ถูกต้องกลับออกมา และ const userMove เพื่อเอาค่านั้นมาเก็บไว้
-const cal = calculateMovement(userMove); //const cal = calculateMovement(userMove); ตรงนี้ หมายถึง เรียกฟังชัน calculateMovement เพื่อหาของใน (userMove) ว่าผู้ใช้ใส่อะไรมาให้ จากนั้นเอาไปเก็บไว้ใน cal ใช่ไหมคะ
-const statusCheck = gameRules(cal)
-console.log(userMove); //clg userMove แสดงค่านั้นออกมา
-console.log(cal)
+const { newRow, newCol } = calculateMovement(userMove); //const cal = calculateMovement(userMove); ตรงนี้ หมายถึง เรียกฟังชัน calculateMovement เพื่อหาของใน (userMove) ว่าผู้ใช้ใส่อะไรมาให้ จากนั้นเอาไปเก็บไว้ใน cal ใช่ไหมคะ
+const status = gameRules(board, newRow, newCol);
+
+//ในวงเล็บใส่เงื่อนไข และใน {} ใส่สิ่งที่อยากให้ทำ = หยุดเล่นถ้าชนะหรือแพ้ และ {} อีกอันเอาไว้บอกว่าจะให้ทำอะไรต่อตามลำดับ
+if (status ==="win" && status ==="lose" ){
+	playing = false;
+}
+	board[playerRow][playerCol]= EMPTY; //ลบผู้เล่นในตำแหน่งเดิม 
+	playerRow=newRow; //อัปเดต row ใหม่
+	playerCol=newCol; //อัปเดต col ใหม่
+	board[playerRow][playerCol]= PLAYER; //ใส่ผู้เล่นใหม่
+}
+
 
